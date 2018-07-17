@@ -1,12 +1,17 @@
-FROM node:7.4.0
+# base image
+FROM node:9.6.1
 
-RUN mkdir -p /app
-WORKDIR /app
+# set working directory
+RUN mkdir /usr/src/app
+WORKDIR /usr/src/app
 
-COPY package.json /app/
-# 由于使用 npm 官方源下载较慢，故改用淘宝的源
-RUN npm config set registry https://registry.npm.taobao.org
-RUN npm install
-COPY . /app
-# 执行构建命令并将代码构建在 /app/dist 目录
-RUN npm run build
+# add `/usr/src/app/node_modules/.bin` to $PATH
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
+
+# install and cache app dependencies
+COPY package.json /usr/src/app/package.json
+RUN npm install --silent
+RUN npm install react-scripts@1.1.1 -g --silent
+
+# start app
+CMD ["npm", "start"]
